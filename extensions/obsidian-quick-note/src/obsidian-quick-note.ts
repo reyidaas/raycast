@@ -33,12 +33,18 @@ async function positionObsidian(retryCount?: number): Promise<void> {
   const activeDesktop = (await WindowManagement.getDesktops()).find(({ active }) => active);
   if (!activeDesktop) return positionObsidian(retryCount ? retryCount + 1 : 1);
 
+  const width = 500;
+  const height = activeDesktop.size.height * 0.85;
+
   await WindowManagement.setWindowBounds({
     id: obsidianApp.id,
     desktopId: activeDesktop.id,
     bounds: {
-      size: { width: 500, height: 700 },
-      position: { x: activeDesktop.size.width - 500 - 100, y: 100 },
+      size: { width, height },
+      position: {
+        x: activeDesktop.size.width - width - activeDesktop.size.width * 0.025,
+        y: activeDesktop.size.height * 0.075,
+      },
     },
   });
 }
