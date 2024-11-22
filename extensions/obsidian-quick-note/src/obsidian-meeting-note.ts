@@ -1,4 +1,10 @@
-import { WindowManagement, getPreferenceValues, type LaunchProps } from '@raycast/api';
+import {
+  WindowManagement,
+  getPreferenceValues,
+  type LaunchProps,
+  closeMainWindow,
+  popToRoot,
+} from '@raycast/api';
 import { readFile, writeFile } from 'fs/promises';
 import { exec } from 'child_process';
 import path from 'path';
@@ -93,5 +99,7 @@ export default async function main(props: LaunchProps) {
     `open obsidian://open\\?vault=${vaultName}\\&file=${encodeURIComponent(path.join('Meetings', name))}`,
   );
 
+  await closeMainWindow();
+  await popToRoot();
   await positionObsidian();
 }

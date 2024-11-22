@@ -1,4 +1,4 @@
-import { WindowManagement, getPreferenceValues } from '@raycast/api';
+import { WindowManagement, getPreferenceValues, closeMainWindow } from '@raycast/api';
 import { readFile, writeFile } from 'fs/promises';
 import { exec } from 'child_process';
 import path from 'path';
@@ -96,5 +96,6 @@ export default async function main() {
     `open obsidian://open\\?vault=${vaultName}\\&file=${encodeURIComponent(path.join('Quick notes', name))}`,
   );
 
+  await closeMainWindow();
   await positionObsidian();
 }
