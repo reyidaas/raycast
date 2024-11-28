@@ -3,7 +3,7 @@
   "name": "obsidian-quick-note",
   "title": "Obsidian Quick Note",
   "description": "It creates a new quick note, places it in vault, and openes it.",
-  "icon": "extension-icon.png",
+  "icon": "obsidian-icon.png",
   "author": "mrejdych",
   "categories": [
     "Applications"
