@@ -1,4 +1,10 @@
-import { WindowManagement, getPreferenceValues, closeMainWindow } from '@raycast/api';
+import {
+  WindowManagement,
+  getPreferenceValues,
+  popToRoot,
+  closeMainWindow,
+  type LaunchProps,
+} from '@raycast/api';
 import { readFile, writeFile } from 'fs/promises';
 import { exec } from 'child_process';
 import path from 'path';
@@ -74,7 +80,7 @@ function getDisplayDate(date: Date): string {
     .replaceAll(':', '.');
 }
 
-export default async function main() {
+export default async function main(props: LaunchProps) {
   const { obsidianPath, vaultName } = getPreferenceValues<Preferences>();
   const vaultPath = path.join(obsidianPath, vaultName);
   const quickNoteTemplatePath = path.join(vaultPath, 'Templates', 'Quick note.md');
@@ -83,12 +89,17 @@ export default async function main() {
   const date = new Date();
   const displayDate = getDisplayDate(date);
   const metaDate = getMetaDate(date);
-  const name = `Quick note - ${displayDate}.md`;
+  const titleArg = props.arguments.title;
+  const name = `${titleArg || 'Quick note'} - ${displayDate}.md`;
 
   const templateContent = (await readFile(quickNoteTemplatePath)).toString();
-  const parsedTemplateContent = templateContent
+  let parsedTemplateContent = templateContent
     .replace('{{date}}{{time}}', metaDate)
     .replace('{{DATE:DD-MM-YYYY HH.mm}}', displayDate);
+
+  if (titleArg) {
+    parsedTemplateContent = parsedTemplateContent.replace(/quick note/gi, titleArg);
+  }
 
   await writeFile(path.join(destPath, name), parsedTemplateContent);
 
@@ -97,5 +108,6 @@ export default async function main() {
   );
 
   await closeMainWindow();
+  await popToRoot();
   await positionObsidian();
 }
