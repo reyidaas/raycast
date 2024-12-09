@@ -99,6 +99,7 @@ export default async function main(props: LaunchProps) {
 
   if (titleArg) {
     parsedTemplateContent = parsedTemplateContent.replace(/quick note/gi, titleArg);
+    parsedTemplateContent += `# ${titleArg}\n\n`;
   }
 
   await writeFile(path.join(destPath, name), parsedTemplateContent);
