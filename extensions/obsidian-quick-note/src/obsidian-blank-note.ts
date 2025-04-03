@@ -1,9 +1,9 @@
 import {
   WindowManagement,
   getPreferenceValues,
-  popToRoot,
-  closeMainWindow,
   type LaunchProps,
+  closeMainWindow,
+  popToRoot,
 } from '@raycast/api';
 import { readFile, writeFile } from 'fs/promises';
 import { exec } from 'child_process';
@@ -90,29 +90,25 @@ function getDisplayDate(date: Date): string {
 export default async function main(props: LaunchProps) {
   const { obsidianPath, vaultName, positionWindow } = getPreferenceValues<Preferences>();
   const vaultPath = path.join(obsidianPath, vaultName);
-  const quickNoteTemplatePath = path.join(vaultPath, 'Templates', 'Quick note.md');
-  const destPath = path.join(vaultPath, 'Quick notes');
+  const meetingNoteTemplatePath = path.join(vaultPath, 'Templates', 'Blank.md');
+  const destPath = path.join(vaultPath, 'Zettelkasten', 'Source');
 
   const date = new Date();
   const displayDate = getDisplayDate(date);
   const metaDate = getMetaDate(date);
-  const titleArg = props.arguments.title;
-  const name = `${titleArg || 'Quick note'} - ${displayDate}.md`;
+  const nameArg: string = props.arguments.name;
+  const name = `${nameArg} ${displayDate}.md`;
 
-  const templateContent = (await readFile(quickNoteTemplatePath)).toString();
-  let parsedTemplateContent = templateContent
+  const templateContent = (await readFile(meetingNoteTemplatePath)).toString();
+  const parsedTemplateContent = templateContent
     .replace('{{date}}{{time}}', metaDate)
-    .replace('{{DATE:DD-MM-YYYY HH.mm}}', displayDate);
-
-  if (titleArg) {
-    parsedTemplateContent = parsedTemplateContent.replace(/quick note/gi, titleArg);
-    parsedTemplateContent += `# ${titleArg}\n\n`;
-  }
+    .replaceAll('{{DATE:DD-MM-YYYY HH.mm}}', displayDate)
+    .replaceAll('{{name}}', nameArg);
 
   await writeFile(path.join(destPath, name), parsedTemplateContent);
   await sleep(500);
   await execAsync(
-    `open obsidian://open\\?vault=${vaultName}\\&file=${encodeURIComponent(path.join('Quick notes', name))}`,
+    `open obsidian://open\\?vault=${vaultName}\\&file=${encodeURIComponent(path.join('Zettelkasten', 'Source', name))}`,
   );
 
   await closeMainWindow();

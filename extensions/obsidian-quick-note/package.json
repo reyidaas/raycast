@@ -36,6 +36,20 @@
           "placeholder": "Meeting name"
         }
       ]
+    },
+    {
+      "name": "obsidian-blank-note",
+      "title": "Obsidian Blank Note",
+      "description": "It creates a new blank note, places it in vault, and openes it.",
+      "mode": "no-view",
+      "arguments": [
+        {
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "placeholder": "Note name"
+        }
+      ]
     }
   ],
   "preferences": [
@@ -54,6 +68,16 @@
       "title": "Vault name",
       "placeholder": "Vault name",
       "description": "A name of your vault"
+    },
+    {
+      "name": "positionWindow",
+      "required": false,
+      "default": false,
+      "type": "checkbox",
+      "label": "Position window",
+      "title": "Position window",
+      "placeholder": "Position window",
+      "description": "Whether the window should be positioned on a side after creating a note"
     }
   ],
   "dependencies": {

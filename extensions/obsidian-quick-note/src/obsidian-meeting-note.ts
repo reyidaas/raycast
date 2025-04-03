@@ -12,6 +12,11 @@ import path from 'path';
 interface Preferences {
   obsidianPath: string;
   vaultName: string;
+  positionWindow: boolean;
+}
+
+async function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(() => resolve(), ms));
 }
 
 async function execAsync(command: string): Promise<void> {
@@ -23,7 +28,7 @@ async function execAsync(command: string): Promise<void> {
   });
 }
 
-async function positionObsidian(retryCount?: number): Promise<void> {
+async function positionObsidian(positionWindow: boolean, retryCount?: number): Promise<void> {
   if (retryCount) {
     if (retryCount > 5) return;
     await new Promise((resolve) => {
@@ -34,10 +39,12 @@ async function positionObsidian(retryCount?: number): Promise<void> {
   const obsidianApp = (await WindowManagement.getWindowsOnActiveDesktop()).find(
     ({ application }) => application?.name === 'Obsidian',
   );
-  if (!obsidianApp) return positionObsidian(retryCount ? retryCount + 1 : 1);
+  if (!obsidianApp) return positionObsidian(positionWindow, retryCount ? retryCount + 1 : 1);
 
   const activeDesktop = (await WindowManagement.getDesktops()).find(({ active }) => active);
-  if (!activeDesktop) return positionObsidian(retryCount ? retryCount + 1 : 1);
+  if (!activeDesktop) return positionObsidian(positionWindow, retryCount ? retryCount + 1 : 1);
+
+  if (!positionWindow) return;
 
   const width = 500;
   const height = activeDesktop.size.height * 0.85;
@@ -76,7 +83,7 @@ function getDisplayDate(date: Date): string {
 }
 
 export default async function main(props: LaunchProps) {
-  const { obsidianPath, vaultName } = getPreferenceValues<Preferences>();
+  const { obsidianPath, vaultName, positionWindow } = getPreferenceValues<Preferences>();
   const vaultPath = path.join(obsidianPath, vaultName);
   const meetingNoteTemplatePath = path.join(vaultPath, 'Templates', 'Meeting.md');
   const destPath = path.join(vaultPath, 'Meetings');
@@ -94,12 +101,12 @@ export default async function main(props: LaunchProps) {
     .replaceAll('{{name}}', nameArg);
 
   await writeFile(path.join(destPath, name), parsedTemplateContent);
-
+  await sleep(500);
   await execAsync(
     `open obsidian://open\\?vault=${vaultName}\\&file=${encodeURIComponent(path.join('Meetings', name))}`,
   );
 
   await closeMainWindow();
   await popToRoot();
-  await positionObsidian();
+  await positionObsidian(positionWindow);
 }
