@@ -3,7 +3,15 @@ import { exec } from 'child_process';
 import path from 'path';
 
 import { useEffect, useState } from 'react';
-import { List, ActionPanel, Action, getPreferenceValues, ListItem, closeMainWindow, popToRoot } from '@raycast/api';
+import {
+  List,
+  ActionPanel,
+  Action,
+  getPreferenceValues,
+  ListItem,
+  closeMainWindow,
+  popToRoot,
+} from '@raycast/api';
 
 interface Preferences {
   obsidianPath: string;
@@ -59,6 +67,7 @@ function Actions({ path }: { path: string }) {
 
 export default function ObsidianSearchTabs() {
   const [items, setItems] = useState<ListItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
@@ -70,7 +79,7 @@ export default function ObsidianSearchTabs() {
             'utf-8',
           ),
         );
-        const obsidianItems: ListItem[] = workspaceSettings.main.children
+        const obsidianItems: ListItem[] = workspaceSettings.main?.children
           .find(({ type }: { type: string }) => type === 'tabs')
           ?.children.map(
             ({
@@ -83,17 +92,23 @@ export default function ObsidianSearchTabs() {
           );
 
         setItems(obsidianItems);
+        setLoading(false);
       } catch (error) {
         console.log(error);
+        setItems([]);
       }
     })();
   }, []);
 
   return (
-    <List navigationTitle="Search currently opened tabs">
-      {items.map(({ id, title, path }) => (
-        <List.Item key={id} title={title} actions={<Actions path={path} />} />
-      ))}
+    <List navigationTitle="Search currently opened tabs" isLoading={loading}>
+      {!loading && !items.length ? (
+        <List.EmptyView title="No opened tabs found" />
+      ) : (
+        items.map(({ id, title, path }) => (
+          <List.Item key={id} title={title} actions={<Actions path={path} />} />
+        ))
+      )}
     </List>
   );
 }
