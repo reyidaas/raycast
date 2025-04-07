@@ -1,17 +1,8 @@
 import { readFile } from 'fs/promises';
-import { exec } from 'child_process';
 import path from 'path';
 
-import { useEffect, useState } from 'react';
-import {
-  List,
-  ActionPanel,
-  Action,
-  getPreferenceValues,
-  ListItem,
-  closeMainWindow,
-  popToRoot,
-} from '@raycast/api';
+import { useEffect, useMemo, useState } from 'react';
+import { List, ActionPanel, Action, getPreferenceValues, ListItem } from '@raycast/api';
 
 interface Preferences {
   obsidianPath: string;
@@ -35,32 +26,15 @@ interface ListItem {
   path: string;
 }
 
-async function execAsync(command: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    exec(command, (err) => {
-      if (err) reject(err);
-      else resolve();
-    });
-  });
-}
-
 function Actions({ path }: { path: string }) {
-  const handleOpen = async (): Promise<void> => {
-    try {
-      const { vaultName } = getPreferenceValues<Preferences>();
-      const uri = `obsidian://adv-uri\\?vault=${encodeURIComponent(vaultName)}\\&filepath=${encodeURIComponent(path)}\\&openmode=tab`;
-
-      await execAsync(`open ${uri}`);
-      await closeMainWindow();
-      await popToRoot();
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const uri = useMemo(() => {
+    const { vaultName } = getPreferenceValues<Preferences>();
+    return `obsidian://adv-uri?vault=${encodeURIComponent(vaultName)}&filepath=${encodeURIComponent(path)}&openmode=true`;
+  }, [path]);
 
   return (
     <ActionPanel>
-      <Action title="Open" onAction={handleOpen} />
+      <Action.Open title="Open" target={uri} />
     </ActionPanel>
   );
 }
