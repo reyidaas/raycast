@@ -56,6 +56,30 @@
       "title": "Obsidian Search Tabs",
       "description": "It searches currently opened tabs",
       "mode": "view"
+    },
+    {
+      "name": "obsidian-open-note",
+      "title": "Obsidian Open Note",
+      "description": "It openes a note",
+      "mode": "no-view",
+      "preferences": [
+        {
+          "title": "Note path",
+          "type": "textfield",
+          "required": true,
+          "name": "notePath",
+          "placeholder": "Note path",
+          "description": "A path to a note"
+        },
+        {
+          "title": "Side positioned",
+          "label": "Side positioned",
+          "type": "checkbox",
+          "required": false,
+          "name": "sidePositioned",
+          "description": "Wheather the opened note shouled be side positioned"
+        }
+      ]
     }
   ],
   "preferences": [
